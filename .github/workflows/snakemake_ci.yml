@@ -1,0 +1,75 @@
+name: PEP-ADMET CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+
+      - name: Lint with ruff
+        run: |
+          uv run ruff check .
+
+      - name: Type check with mypy
+        run: |
+          uv run mypy src/pep_admet
+
+      - name: Run unit and integration tests
+        run: |
+          uv run pytest --cov=pep_admet --cov-report=term-missing
+
+  snakemake-catalog-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Validate config schema
+        run: |
+          uv run --with jsonschema --with pyyaml python -c "
+          import yaml, jsonschema
+          from pathlib import Path
+          schema = yaml.safe_load(Path('config/schemas/config.schema.yaml').read_text())
+          cfg = yaml.safe_load(Path('.test/config/config.yaml').read_text())
+          jsonschema.validate(instance=cfg, schema=schema)
+          print('CI Config Schema Validation Passed!')
+          "
+
+      - name: Snakemake Dry-Run
+        run: |
+          uv run --with snakemake snakemake --configfile .test/config/config.yaml -n -q
+
+      - name: Snakemake Execution & HTML Report
+        run: |
+          uv run --with snakemake --with matplotlib --with numpy --with pygments snakemake --configfile .test/config/config.yaml --cores 2 --report test_report.html
+
+      - name: Upload Report Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: snakemake-report
+          path: test_report.html

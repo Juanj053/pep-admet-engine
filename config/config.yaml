@@ -1,0 +1,25 @@
+# PEP-ADMET Engine Configuration
+# ===============================
+
+# Map of candidate peptide identifiers to amino acid sequences
+peptides:
+  substance_p: "RPKPQQFFGLM"
+  glp1_native: "HAEGTFTSDVSSYLEGQAAKEFIAWLVKGR"
+  somatostatin: "AGCKNFFWKTFTSC"
+  oxytocin: "CYIQNCPLG"
+  bivalirudin: "FPRPGGGGNGDFEEIPEEYL"
+
+# Active Protease Panel (omit or set to empty to scan all 15+ proteases)
+proteases:
+  - "trypsin"
+  - "chymotrypsin_high"
+  - "pepsin_ph13"
+  - "elastase"
+  - "dpp4"
+  - "thrombin"
+  - "cathepsin_b"
+
+# Reporting and Visualization
+generate_plots: true
+dpi: 300
+export_fragments: true

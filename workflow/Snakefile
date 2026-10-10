@@ -1,0 +1,37 @@
+from pathlib import Path
+from snakemake.utils import min_version, validate
+
+min_version("8.0")
+
+configfile: "config/config.yaml"
+
+validate(
+    config,
+    schema=Path(workflow.basedir).parent / "config/schemas/config.schema.yaml",
+)
+
+report: "report/workflow.rst"
+
+include: "rules/common.smk"
+include: "rules/protease_cleavage.smk"
+include: "rules/plasma_halflife.smk"
+include: "rules/membrane_permeability.smk"
+include: "rules/stabilization_advisor.smk"
+include: "rules/reporting.smk"
+
+rule all:
+    input:
+        expand(
+            [
+                "results/{sample}/cleavage_profile.json",
+                "results/{sample}/digestion_fragments.csv",
+                "results/{sample}/plasma_halflife.json",
+                "results/{sample}/membrane_permeability.json",
+                "results/{sample}/stabilization_plan.json",
+                "results/{sample}/admet_profile.json",
+                "results/{sample}/admet_analytics.png",
+            ],
+            sample=config["peptides"],
+        ),
+        "results/admet_summary.csv",
+        "results/global_admet_report.json",

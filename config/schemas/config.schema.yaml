@@ -1,0 +1,57 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: "PEP-ADMET Engine Configuration Schema"
+description: "Strict configuration schema for peptide ADMET profiling and stabilization workflow."
+type: object
+additionalProperties: false
+
+properties:
+  peptides:
+    type: object
+    description: "Map of candidate peptide identifiers to standard IUPAC amino acid sequences."
+    minProperties: 1
+    additionalProperties:
+      type: string
+      pattern: '^[ACDEFGHIKLMNPQRSTVWYacdefghiklmnpqrstvwy\s]+$'
+
+  proteases:
+    type: array
+    description: "List of protease names to screen. If omitted, all supported proteases are analyzed."
+    items:
+      type: string
+      enum:
+        - "trypsin"
+        - "chymotrypsin_high"
+        - "chymotrypsin_low"
+        - "pepsin_ph13"
+        - "pepsin_ph2"
+        - "elastase"
+        - "proteinase_k"
+        - "thermolysin"
+        - "endoproteinase_gluc"
+        - "endoproteinase_lysc"
+        - "endoproteinase_aspn"
+        - "thrombin"
+        - "factor_xa"
+        - "dpp4"
+        - "neprilysin"
+        - "cathepsin_b"
+        - "cathepsin_d"
+
+  generate_plots:
+    type: boolean
+    default: true
+    description: "Whether to render multi-panel publication figures."
+
+  dpi:
+    type: integer
+    minimum: 72
+    default: 300
+    description: "Resolution in dots per inch for saved PNG figures."
+
+  export_fragments:
+    type: boolean
+    default: true
+    description: "Whether to export granular CSV tables of digested fragments."
+
+required:
+  - peptides

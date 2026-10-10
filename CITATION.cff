@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software in your research or drug discovery pipelines, please cite it as below."
+authors:
+  - family-names: "Álvarez Morales"
+    given-names: "Juan José"
+    email: "jjalvarezm77@gmail.com"
+    affiliation: "Elevate Biotech & Universidad Técnica de Ambato"
+title: "pep-admet-engine: In-Silico Pharmacokinetic Profiling, Multi-Protease Stability Screening, and Rational Peptidomimetic Stabilization Advisor for Therapeutic Peptides"
+version: 0.1.0
+date-released: 2026-10-10
+url: "https://github.com/Juanj053/pep-admet-engine"
+repository-code: "https://github.com/Juanj053/pep-admet-engine"
+license: MIT
+keywords:
+  - "therapeutic-peptides"
+  - "admet"
+  - "pharmacokinetics"
+  - "protease-stability"
+  - "dpp4"
+  - "peptidomimetics"
+  - "snakemake-workflow-catalog"
+  - "bioinformatics"

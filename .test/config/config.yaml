@@ -1,0 +1,13 @@
+# PEP-ADMET Hermetic CI Test Configuration
+peptides:
+  synthetic_lead: "RPKPQQFFGLM"
+  synthetic_glp1: "HAEGTFTSD"
+
+proteases:
+  - "trypsin"
+  - "chymotrypsin_high"
+  - "dpp4"
+
+generate_plots: true
+dpi: 150
+export_fragments: true
