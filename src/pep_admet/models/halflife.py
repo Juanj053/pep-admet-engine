@@ -5,7 +5,6 @@ Data models for peptide plasma half-life and pharmacokinetics.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional
 
 
 @dataclass
@@ -23,7 +22,7 @@ class HalfLifePrediction:
     predicted_clearance_ml_min_kg: float
     predicted_vss_l_kg: float
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         return {
             "peptide_id": self.peptide_id,
             "sequence": self.sequence,

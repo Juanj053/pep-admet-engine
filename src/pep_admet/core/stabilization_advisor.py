@@ -7,8 +7,6 @@ to overcome proteolytic vulnerability and pharmacokinetic liabilities.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
-
 from pep_admet.models.cleavage import CleavageResult
 from pep_admet.models.halflife import HalfLifePrediction
 from pep_admet.models.permeability import PermeabilityMetrics
@@ -24,13 +22,13 @@ class StabilizationAdvisor:
     def formulate_plan(
         self,
         cleavage: CleavageResult,
-        halflife: Optional[HalfLifePrediction] = None,
-        permeability: Optional[PermeabilityMetrics] = None,
+        halflife: HalfLifePrediction | None = None,
+        permeability: PermeabilityMetrics | None = None,
     ) -> StabilizationPlan:
         seq = cleavage.sequence
         length = len(seq)
-        recommendations: List[StabilizationRecommendation] = []
-        engineered_variants: List[Dict[str, str]] = []
+        recommendations: list[StabilizationRecommendation] = []
+        engineered_variants: list[dict[str, str]] = []
 
         # 1. N-terminal Capping Strategy
         # Check for DPP-4 or general aminopeptidase vulnerability
@@ -47,9 +45,11 @@ class StabilizationAdvisor:
                     priority=1,
                 )
             )
-            # generate variant
+            # generate variants
             mod_seq = f"Ac-{seq}"
             engineered_variants.append({"name": "N-term-Acetylated", "sequence": mod_seq})
+            if len(seq) >= 2:
+                engineered_variants.append({"name": "P2-Gly-DPP4-Shielded", "sequence": seq[0] + "G" + seq[2:]})
         else:
             recommendations.append(
                 StabilizationRecommendation(
@@ -78,6 +78,14 @@ class StabilizationAdvisor:
 
         # 3. Scissile Bond Hardening (D-amino acids or N-methylation)
         if cleavage.hotspot_residues:
+            hp0 = cleavage.hotspot_residues[0]
+            new_aa = "A" if seq[hp0 - 1] != "A" else "G"
+            engineered_variants.append(
+                {
+                    "name": f"Hotspot-P1-{hp0}-{new_aa}",
+                    "sequence": seq[: hp0 - 1] + new_aa + seq[hp0:],
+                }
+            )
             for hp in cleavage.hotspot_residues[:3]:
                 res = seq[hp - 1]
                 recommendations.append(
@@ -119,6 +127,8 @@ class StabilizationAdvisor:
                     priority=1,
                 )
             )
+
+        engineered_variants.append({"name": "N-Ac-C-Amide-Capped", "sequence": f"Ac-{seq}-NH2"})
 
         summary = (
             f"Analyzed {length}-mer peptide '{cleavage.peptide_id}'. Identified {cleavage.cleavage_count} cleavage sites "

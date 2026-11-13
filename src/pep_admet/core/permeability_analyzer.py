@@ -7,13 +7,10 @@ predicted Caco-2 log Papp, Blood-Brain Barrier (log BB), and CPP score.
 
 from __future__ import annotations
 
-import math
-from typing import Dict
-
 from pep_admet.models.permeability import PermeabilityMetrics
 
 # TPSA contributions per residue (Å²)
-RESIDUE_TPSA: Dict[str, float] = {
+RESIDUE_TPSA: dict[str, float] = {
     "A": 29.1, "R": 73.2, "N": 63.3, "D": 66.4, "C": 29.1,
     "E": 66.4, "Q": 63.3, "G": 29.1, "H": 42.0, "I": 29.1,
     "L": 29.1, "K": 55.1, "M": 29.1, "F": 29.1, "P": 20.3,
@@ -21,7 +18,7 @@ RESIDUE_TPSA: Dict[str, float] = {
 }
 
 # Kyte-Doolittle Hydropathy values
-HYDROPATHY: Dict[str, float] = {
+HYDROPATHY: dict[str, float] = {
     "A": 1.8, "R": -4.5, "N": -3.5, "D": -3.5, "C": 2.5,
     "E": -3.5, "Q": -3.5, "G": -0.4, "H": -3.2, "I": 4.5,
     "L": 3.8, "K": -3.9, "M": 1.9, "F": 2.8, "P": -1.6,
@@ -29,12 +26,12 @@ HYDROPATHY: Dict[str, float] = {
 }
 
 # Hydrogen bond donor / acceptor counts per residue
-HBD_MAP: Dict[str, int] = {
+HBD_MAP: dict[str, int] = {
     "A": 1, "R": 4, "N": 2, "D": 1, "C": 1, "E": 1, "Q": 2,
     "G": 1, "H": 2, "I": 1, "L": 1, "K": 2, "M": 1, "F": 1,
     "P": 0, "S": 2, "T": 2, "W": 2, "Y": 2, "V": 1,
 }
-HBA_MAP: Dict[str, int] = {
+HBA_MAP: dict[str, int] = {
     "A": 1, "R": 2, "N": 2, "D": 2, "C": 1, "E": 2, "Q": 2,
     "G": 1, "H": 2, "I": 1, "L": 1, "K": 1, "M": 1, "F": 1,
     "P": 1, "S": 2, "T": 2, "W": 1, "Y": 2, "V": 1,

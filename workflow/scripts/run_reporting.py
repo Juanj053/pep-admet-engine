@@ -1,4 +1,3 @@
-import csv
 import json
 import logging
 import sys
@@ -40,6 +39,7 @@ if str(repo_root / "src") not in sys.path:
     sys.path.insert(0, str(repo_root / "src"))
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -55,13 +55,13 @@ builder = ADMETReportBuilder()
 profiles = []
 
 for sample in samples:
-    with open(f"results/{sample}/cleavage_profile.json", "r", encoding="utf-8") as f:
+    with open(f"results/{sample}/cleavage_profile.json", encoding="utf-8") as f:
         c_raw = json.load(f)
-    with open(f"results/{sample}/plasma_halflife.json", "r", encoding="utf-8") as f:
+    with open(f"results/{sample}/plasma_halflife.json", encoding="utf-8") as f:
         h_raw = json.load(f)
-    with open(f"results/{sample}/membrane_permeability.json", "r", encoding="utf-8") as f:
+    with open(f"results/{sample}/membrane_permeability.json", encoding="utf-8") as f:
         p_raw = json.load(f)
-    with open(f"results/{sample}/stabilization_plan.json", "r", encoding="utf-8") as f:
+    with open(f"results/{sample}/stabilization_plan.json", encoding="utf-8") as f:
         s_raw = json.load(f)
 
     cleavage = CleavageResult(
@@ -153,7 +153,7 @@ for sample in samples:
             recs_lines.append(f"   Gain: {r.predicted_half_life_gain_fold:.1f}x t1/2 | Risk: {r.potential_binding_impact}")
             recs_lines.append("")
         recs_text = chr(10).join(recs_lines)
-        ax_d.text(0.05, 0.95, recs_text, transform=ax_d.transAxes, verticalalignment="top", fontfamily="monospace", fontsize=9, bbox=dict(boxstyle="round,pad=0.5", facecolor="#f8f9fa", edgecolor="#bdc3c7"))
+        ax_d.text(0.05, 0.95, recs_text, transform=ax_d.transAxes, verticalalignment="top", fontfamily="monospace", fontsize=9, bbox={"boxstyle": "round,pad=0.5", "facecolor": "#f8f9fa", "edgecolor": "#bdc3c7"})
 
         plt.tight_layout()
         plt.savefig(f"results/{sample}/admet_analytics.png", dpi=snakemake.params.dpi)

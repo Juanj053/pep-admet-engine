@@ -1,4 +1,3 @@
-import csv
 import json
 import logging
 import sys
@@ -46,7 +45,7 @@ seq = snakemake.params.sequence
 
 # Read cleavage result to extract proteolytic vulnerability index
 in_cleavage = Path(snakemake.input.cleavage_json)
-with open(in_cleavage, "r", encoding="utf-8") as f:
+with open(in_cleavage, encoding="utf-8") as f:
     cleavage_data = json.load(f)
 pvi = cleavage_data.get("proteolytic_vulnerability_index", 20.0)
 

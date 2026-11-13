@@ -5,7 +5,6 @@ Data models for membrane permeability and oral bioavailability.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional
 
 
 @dataclass
@@ -26,7 +25,7 @@ class PermeabilityMetrics:
     cell_penetrating_score: float  # 0.0 to 1.0 (CPP propensity)
     oral_bioavailability_score: float  # 0.0 to 100.0 (bRo5 / Veber compliance)
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         return {
             "peptide_id": self.peptide_id,
             "sequence": self.sequence,

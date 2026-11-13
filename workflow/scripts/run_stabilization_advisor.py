@@ -1,4 +1,3 @@
-import csv
 import json
 import logging
 import sys
@@ -46,11 +45,11 @@ from pep_admet.models.permeability import PermeabilityMetrics
 
 sample = snakemake.wildcards.sample
 
-with open(snakemake.input.cleavage_json, "r", encoding="utf-8") as f:
+with open(snakemake.input.cleavage_json, encoding="utf-8") as f:
     c_raw = json.load(f)
-with open(snakemake.input.halflife_json, "r", encoding="utf-8") as f:
+with open(snakemake.input.halflife_json, encoding="utf-8") as f:
     h_raw = json.load(f)
-with open(snakemake.input.permeability_json, "r", encoding="utf-8") as f:
+with open(snakemake.input.permeability_json, encoding="utf-8") as f:
     p_raw = json.load(f)
 
 cleavage = CleavageResult(

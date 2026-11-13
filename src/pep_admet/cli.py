@@ -23,6 +23,11 @@ def main() -> int:
     parser.add_argument("--sequence", "-s", type=str, required=True, help="Peptide amino acid sequence")
     parser.add_argument("--name", "-n", type=str, default="peptide_candidate", help="Peptide candidate identifier")
     parser.add_argument("--output", "-o", type=str, default=None, help="Path to output JSON profile")
+    parser.add_argument(
+        "--compare-analogs",
+        action="store_true",
+        help="Screen and compare engineered peptidomimetic analogs against wildtype",
+    )
     args = parser.parse_args()
 
     protease_eng = ProteaseEngine()
@@ -38,8 +43,16 @@ def main() -> int:
     profile = builder.build_profile(cleavage, halflife, perm, plan)
 
     out_data = profile.to_dict()
+    if args.compare_analogs:
+        out_data["analog_comparison"] = builder.compare_analogs(
+            profile, protease_eng, halflife_pred, perm_analyzer
+        )
+
     if args.output:
-        builder.export_json(profile, args.output)
+        out_path = Path(args.output)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(out_data, f, indent=2)
         print(f"Profile written to {args.output}")
     else:
         print(json.dumps(out_data, indent=2))

@@ -5,7 +5,6 @@ Composite data models for end-to-end ADMET reports.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional
 
 from .cleavage import CleavageResult
 from .halflife import HalfLifePrediction
@@ -24,7 +23,7 @@ class PeptideADMETProfile:
     stabilization: StabilizationPlan
     overall_admet_score: float  # 0 to 100
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         return {
             "peptide_id": self.peptide_id,
             "sequence": self.sequence,

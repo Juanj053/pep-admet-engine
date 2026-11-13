@@ -5,7 +5,6 @@ Data models for rational stabilization and peptidomimetic engineering.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional
 
 
 @dataclass
@@ -19,7 +18,7 @@ class StabilizationRecommendation:
     potential_binding_impact: str  # "Minimal / Low risk", "Moderate / Verify epitope", "Substantial"
     priority: int  # 1 (Highest), 2, 3
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         return {
             "strategy_type": self.strategy_type,
             "target_site": self.target_site,
@@ -37,10 +36,10 @@ class StabilizationPlan:
     peptide_id: str
     wildtype_sequence: str
     vulnerability_summary: str
-    recommendations: List[StabilizationRecommendation]
-    engineered_variants: List[Dict[str, str]]  # list of modified analogs
+    recommendations: list[StabilizationRecommendation]
+    engineered_variants: list[dict[str, str]]  # list of modified analogs
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         return {
             "peptide_id": self.peptide_id,
             "wildtype_sequence": self.wildtype_sequence,

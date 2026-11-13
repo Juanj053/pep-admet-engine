@@ -9,7 +9,6 @@ subsite nomenclature, and empirical steric restriction filters.
 from __future__ import annotations
 
 import re
-from typing import Dict, List, Optional, Set, Tuple
 
 from pep_admet.models.cleavage import (
     CleavageResult,
@@ -19,7 +18,7 @@ from pep_admet.models.cleavage import (
 )
 
 # Standard average isotopic molecular masses for amino acid residues (minus H2O)
-AA_RESIDUE_MASSES: Dict[str, float] = {
+AA_RESIDUE_MASSES: dict[str, float] = {
     "A": 71.0788,
     "R": 156.1875,
     "N": 114.1038,
@@ -65,18 +64,18 @@ class ProteaseEngine:
     """
 
     def __init__(self) -> None:
-        self._proteases: Dict[str, ProteaseSpec] = self._init_protease_catalog()
+        self._proteases: dict[str, ProteaseSpec] = self._init_protease_catalog()
 
     @property
-    def available_proteases(self) -> List[str]:
+    def available_proteases(self) -> list[str]:
         """Return list of all registered protease identifiers."""
-        return sorted(list(self._proteases.keys()))
+        return sorted(self._proteases.keys())
 
-    def get_protease_spec(self, name: str) -> Optional[ProteaseSpec]:
+    def get_protease_spec(self, name: str) -> ProteaseSpec | None:
         """Retrieve metadata and specificity for a specific protease."""
         return self._proteases.get(name.lower())
 
-    def _init_protease_catalog(self) -> Dict[str, ProteaseSpec]:
+    def _init_protease_catalog(self) -> dict[str, ProteaseSpec]:
         """Initialize canonical protease specificity database."""
         catalog = {
             "trypsin": ProteaseSpec(
@@ -244,7 +243,7 @@ class ProteaseEngine:
         invalid_chars = set(clean_seq) - VALID_AMINO_ACIDS
         if invalid_chars:
             raise ValueError(
-                f"Invalid non-canonical amino acid(s) detected: {sorted(list(invalid_chars))}. "
+                f"Invalid non-canonical amino acid(s) detected: {sorted(invalid_chars)}. "
                 f"Supported 20 standard IUPAC amino acids only."
             )
         return clean_seq
@@ -278,7 +277,7 @@ class ProteaseEngine:
             c_y = counts["Y"] / (1.0 + 10.0 ** (PKA_VALUES["Y"] - ph))
             neg = c_c_term + c_d + c_e + c_c + c_y
 
-            return pos - neg
+            return float(pos - neg)
 
         low = 0.0
         high = 14.0
@@ -306,7 +305,7 @@ class ProteaseEngine:
         self,
         sequence: str,
         peptide_id: str = "peptide_candidate",
-        proteases: Optional[List[str]] = None,
+        proteases: list[str] | None = None,
     ) -> CleavageResult:
         """
         Perform comprehensive cleavage profiling of the peptide.
@@ -324,8 +323,8 @@ class ProteaseEngine:
                 if pk not in self._proteases:
                     raise ValueError(f"Unknown protease: {pk}. Available: {self.available_proteases}")
 
-        detected_sites: List[CleavageSite] = []
-        cleavage_map: Dict[int, List[str]] = {i: [] for i in range(1, seq_len)}
+        detected_sites: list[CleavageSite] = []
+        cleavage_map: dict[int, list[str]] = {i: [] for i in range(1, seq_len)}
 
         for pkey in active_protease_keys:
             spec = self._proteases[pkey]
@@ -423,8 +422,8 @@ class ProteaseEngine:
                 cleavage_map[site_idx].append(spec.name)
 
         # Generate digestion fragments from unique cut positions
-        cut_positions = sorted(list({s.site_index for s in detected_sites}))
-        fragments: List[PeptideFragment] = []
+        cut_positions = sorted({s.site_index for s in detected_sites})
+        fragments: list[PeptideFragment] = []
         prev_cut = 0
 
         for frag_idx, cut in enumerate(cut_positions + [seq_len], start=1):

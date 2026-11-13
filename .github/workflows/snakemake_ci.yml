@@ -66,7 +66,8 @@ jobs:
 
       - name: Snakemake Execution & HTML Report
         run: |
-          uv run --with snakemake --with matplotlib --with numpy --with pygments snakemake --configfile .test/config/config.yaml --cores 2 --report test_report.html
+          uv run --with snakemake --with matplotlib --with numpy --with pygments --with jinja2 --with docutils snakemake --configfile .test/config/config.yaml --cores 2
+          uv run --with snakemake --with matplotlib --with numpy --with pygments --with jinja2 --with docutils snakemake --configfile .test/config/config.yaml --report test_report.html
 
       - name: Upload Report Artifact
         uses: actions/upload-artifact@v4

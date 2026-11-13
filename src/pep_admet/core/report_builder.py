@@ -10,13 +10,18 @@ from __future__ import annotations
 import csv
 import json
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import TYPE_CHECKING
 
 from pep_admet.models.cleavage import CleavageResult
 from pep_admet.models.halflife import HalfLifePrediction
 from pep_admet.models.permeability import PermeabilityMetrics
 from pep_admet.models.report import PeptideADMETProfile
 from pep_admet.models.stabilization import StabilizationPlan
+
+if TYPE_CHECKING:
+    from pep_admet.core.halflife_predictor import PlasmaHalfLifePredictor
+    from pep_admet.core.permeability_analyzer import MembranePermeabilityAnalyzer
+    from pep_admet.core.protease_engine import ProteaseEngine
 
 
 class ADMETReportBuilder:
@@ -48,13 +53,76 @@ class ADMETReportBuilder:
             overall_admet_score=overall_score,
         )
 
-    def export_json(self, profile: PeptideADMETProfile, output_path: Union[str, Path]) -> None:
+    def export_json(self, profile: PeptideADMETProfile, output_path: str | Path) -> None:
         p = Path(output_path)
         p.parent.mkdir(parents=True, exist_ok=True)
         with open(p, "w", encoding="utf-8") as f:
             json.dump(profile.to_dict(), f, indent=2)
 
-    def export_summary_csv(self, profiles: List[PeptideADMETProfile], output_path: Union[str, Path]) -> None:
+    def compare_analogs(
+        self,
+        wildtype_profile: PeptideADMETProfile,
+        protease_engine: ProteaseEngine,
+        halflife_predictor: PlasmaHalfLifePredictor,
+        permeability_analyzer: MembranePermeabilityAnalyzer,
+    ) -> list[dict[str, float | str]]:
+        """Screen and rank engineered peptidomimetic analogs against the wildtype profile."""
+        comparisons: list[dict[str, float | str]] = []
+        wt_t_half = max(1e-6, wildtype_profile.halflife.estimated_t_half_minutes)
+
+        for entry in wildtype_profile.stabilization.engineered_variants:
+            variant_id = entry.get("name", "variant")
+            raw_seq = entry["sequence"]
+
+            has_n_cap = raw_seq.startswith("Ac-")
+            has_c_cap = raw_seq.endswith("-NH2")
+            clean_seq = raw_seq
+            if has_n_cap:
+                clean_seq = clean_seq[len("Ac-") :]
+            if has_c_cap:
+                clean_seq = clean_seq[: -len("-NH2")]
+
+            active_proteases = [
+                p for p in protease_engine.available_proteases if not (has_n_cap and p == "dpp4")
+            ]
+            var_cleavage = protease_engine.analyze(
+                clean_seq, peptide_id=variant_id, proteases=active_proteases
+            )
+            effective_pvi = max(
+                2.0,
+                var_cleavage.proteolytic_vulnerability_index
+                * (0.75 if has_n_cap else 1.0)
+                * (0.85 if has_c_cap else 1.0),
+            )
+            var_cleavage.proteolytic_vulnerability_index = effective_pvi
+            var_cleavage.proteolytic_resistance_score = max(0.0, 100.0 - effective_pvi)
+
+            var_halflife = halflife_predictor.predict(
+                clean_seq,
+                peptide_id=variant_id,
+                proteolytic_vulnerability_index=effective_pvi,
+            )
+            var_perm = permeability_analyzer.analyze(clean_seq, peptide_id=variant_id)
+            var_profile = self.build_profile(
+                var_cleavage, var_halflife, var_perm, wildtype_profile.stabilization
+            )
+            comparisons.append(
+                {
+                    "variant_id": variant_id,
+                    "sequence": raw_seq,
+                    "proteolytic_vulnerability_index": round(effective_pvi, 2),
+                    "estimated_t_half_minutes": round(var_halflife.estimated_t_half_minutes, 2),
+                    "half_life_fold_vs_wt": round(
+                        var_halflife.estimated_t_half_minutes / wt_t_half, 2
+                    ),
+                    "caco2_log_papp_cm_s": round(var_perm.caco2_log_papp_cm_s, 2),
+                    "overall_admet_score": round(var_profile.overall_admet_score, 1),
+                }
+            )
+
+        return comparisons
+
+    def export_summary_csv(self, profiles: list[PeptideADMETProfile], output_path: str | Path) -> None:
         p = Path(output_path)
         p.parent.mkdir(parents=True, exist_ok=True)
         fieldnames = [

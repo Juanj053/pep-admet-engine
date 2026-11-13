@@ -8,12 +8,11 @@ renal filtration cutoff, and elimination half-life (t1/2).
 from __future__ import annotations
 
 import math
-from typing import Dict, Optional
 
 from pep_admet.models.halflife import HalfLifePrediction
 
 # Standard molecular weights
-AA_MASSES: Dict[str, float] = {
+AA_MASSES: dict[str, float] = {
     "A": 71.08, "R": 156.19, "N": 114.10, "D": 115.09, "C": 103.14,
     "E": 129.12, "Q": 128.13, "G": 57.05, "H": 137.14, "I": 113.16,
     "L": 113.16, "K": 128.17, "M": 131.19, "F": 147.18, "P": 97.12,

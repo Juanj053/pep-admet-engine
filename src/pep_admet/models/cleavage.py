@@ -5,7 +5,6 @@ Data models for peptide protease cleavage profiling.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
 
 
 @dataclass(frozen=True)
@@ -19,7 +18,7 @@ class CleavageSite:
     specificity_class: str = "canonical"
     cleavage_efficiency: float = 1.0
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         return {
             "site_index": self.site_index,
             "protease_name": self.protease_name,
@@ -42,7 +41,7 @@ class PeptideFragment:
     molecular_weight: float
     isoelectric_point: float
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         return {
             "fragment_index": self.fragment_index,
             "start_pos": self.start_pos,
@@ -62,10 +61,10 @@ class ProteaseSpec:
     description: str
     biological_context: str  # serum, digestive, lysosomal, plasma
     optimum_ph: float
-    p1_allowed: List[str] = field(default_factory=list)
-    p1_disallowed: List[str] = field(default_factory=list)
-    p1_prime_disallowed: List[str] = field(default_factory=lambda: ["P"])
-    p1_prime_allowed: List[str] = field(default_factory=list)
+    p1_allowed: list[str] = field(default_factory=list)
+    p1_disallowed: list[str] = field(default_factory=list)
+    p1_prime_disallowed: list[str] = field(default_factory=lambda: ["P"])
+    p1_prime_allowed: list[str] = field(default_factory=list)
     n_terminal_only: bool = False
     c_terminal_only: bool = False
 
@@ -77,16 +76,16 @@ class CleavageResult:
     sequence: str
     length: int
     molecular_weight: float
-    proteases_analyzed: List[str]
-    cleavage_sites: List[CleavageSite] = field(default_factory=list)
-    fragments: List[PeptideFragment] = field(default_factory=list)
+    proteases_analyzed: list[str]
+    cleavage_sites: list[CleavageSite] = field(default_factory=list)
+    fragments: list[PeptideFragment] = field(default_factory=list)
     cleavage_count: int = 0
     proteolytic_vulnerability_index: float = 0.0  # 0 to 100
     proteolytic_resistance_score: float = 100.0  # 0 to 100
-    hotspot_residues: List[int] = field(default_factory=list)
-    cleavage_map: Dict[int, List[str]] = field(default_factory=dict)
+    hotspot_residues: list[int] = field(default_factory=list)
+    cleavage_map: dict[int, list[str]] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         return {
             "peptide_id": self.peptide_id,
             "sequence": self.sequence,
